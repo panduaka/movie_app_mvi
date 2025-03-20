@@ -56,4 +56,14 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Networking
+    implementation(libs.square.moshi.moshi)
+    implementation(libs.square.moshi.moshi.adapter)
+    implementation(libs.square.moshi.moshi.kotlin)
+    implementation(libs.retrofit2.retrofit)
+    implementation(libs.retrofit2.retrofit.converter.moshi)
+    implementation(libs.com.squareup.okhttp3.okhttp)
+    implementation(libs.com.squareup.okhttp3.logging.interceptor)
+
 }
