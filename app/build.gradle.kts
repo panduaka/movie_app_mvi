@@ -66,4 +66,11 @@ dependencies {
     implementation(libs.com.squareup.okhttp3.okhttp)
     implementation(libs.com.squareup.okhttp3.logging.interceptor)
 
+    //Test
+    testImplementation(libs.junit) // JUnit
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.23") // Kotlin Test
+    testImplementation("org.mockito:mockito-core:5.10.0") // Mockito Core
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1") // Mockito Kotlin
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0") // Coroutines Test
+
 }

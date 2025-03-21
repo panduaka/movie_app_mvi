@@ -1,0 +1,133 @@
+package com.example.movieapp.data.repository
+
+import com.example.movieapp.data.model.MovieData
+import com.example.movieapp.data.model.MovieResponse
+import com.example.movieapp.data.remote_service.MovieApiService
+import com.example.movieapp.domain.model.Movie
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
+import org.mockito.Mock
+import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
+import java.io.IOException
+import kotlin.test.assertFailsWith
+
+@ExperimentalCoroutinesApi
+class MovieRepositoryTest {
+
+    @Mock
+    private lateinit var movieService: MovieApiService
+
+    private lateinit var movieRepository: MovieRepositoryImpl
+
+    @Before
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
+        movieRepository = MovieRepositoryImpl(movieService)
+    }
+
+    @Test
+    fun `getPopularMovies returns list of movies on success`() = runTest {
+        // Arrange
+        val expectedMovies = listOf(
+            Movie(
+                id = 1,
+                title = "Movie 1",
+                originalTitle = "Original Movie 1",
+                overview = "Overview 1",
+                posterPath = "/poster1.jpg",
+                backdropPath = "/backdrop1.jpg",
+                mediaType = "movie",
+                adult = false,
+                originalLanguage = "en",
+                genreIds = listOf(1, 2),
+                popularity = 10.0,
+                releaseDate = "2023-01-01",
+                video = false,
+                voteAverage = 8.0,
+                voteCount = 100
+            ),
+            Movie(
+                id = 2,
+                title = "Movie 2",
+                originalTitle = "Original Movie 2",
+                overview = "Overview 2",
+                posterPath = "/poster2.jpg",
+                backdropPath = "/backdrop2.jpg",
+                mediaType = "movie",
+                adult = false,
+                originalLanguage = "en",
+                genreIds = listOf(3, 4),
+                popularity = 9.0,
+                releaseDate = "2023-02-01",
+                video = false,
+                voteAverage = 7.5,
+                voteCount = 50
+            )
+        )
+        val movieResponse = MovieResponse(
+            page = 1,
+            results = listOf(
+                MovieData(
+                    id = 1,
+                    title = "Movie 1",
+                    originalTitle = "Original Movie 1",
+                    overview = "Overview 1",
+                    posterPath = "/poster1.jpg",
+                    backdropPath = "/backdrop1.jpg",
+                    mediaType = "movie",
+                    adult = false,
+                    originalLanguage = "en",
+                    genreIds = listOf(1, 2),
+                    popularity = 10.0,
+                    releaseDate = "2023-01-01",
+                    video = false,
+                    voteAverage = 8.0,
+                    voteCount = 100
+                ),
+                MovieData(
+                    id = 2,
+                    title = "Movie 2",
+                    originalTitle = "Original Movie 2",
+                    overview = "Overview 2",
+                    posterPath = "/poster2.jpg",
+                    backdropPath = "/backdrop2.jpg",
+                    mediaType = "movie",
+                    adult = false,
+                    originalLanguage = "en",
+                    genreIds = listOf(3, 4),
+                    popularity = 9.0,
+                    releaseDate = "2023-02-01",
+                    video = false,
+                    voteAverage = 7.5,
+                    voteCount = 50
+                )
+            ),
+            totalPages = 1,
+            totalResults = 2
+        )
+        `when`(movieService.getPopularMovies()).thenReturn(movieResponse)
+
+        // Act
+        val actualMovies = movieRepository.getPopularMovies()
+
+        // Assert
+        assertEquals(expectedMovies, actualMovies)
+    }
+
+    @Test
+    fun `getPopularMovies throws IOException on network error`() = runTest {
+        // Arrange
+        `when`(movieService.getPopularMovies()).thenThrow((RuntimeException(IOException())))
+
+        // Act & Assert
+        assertFailsWith<RuntimeException> {
+            movieRepository.getPopularMovies()
+        }.also {
+            assert(it.cause is IOException)
+        }
+    }
+}
