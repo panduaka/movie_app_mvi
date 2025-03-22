@@ -13,24 +13,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
-import com.example.movieapp.data.remote_service.RetrofitInstance
-import com.example.movieapp.data.repository.MovieRepositoryImpl
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import com.example.movieapp.ui.theme.MovieAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var getPopularMoviesUseCase:
+            GetPopularMoviesUseCase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Your TMDB API key (replace this with a real key)
-
-        val getPopularMoviesUseCase = GetPopularMoviesUseCase(
-            movieRepository = MovieRepositoryImpl(
-                movieService = RetrofitInstance.createMovieService()
-            )
-        )
-        // Create API service
-        val movieService = RetrofitInstance.createMovieService()
 
         // Fetch movies in a coroutine
         lifecycleScope.launch {
@@ -54,7 +50,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 //@Composable
 //fun MovieNavGraph() {

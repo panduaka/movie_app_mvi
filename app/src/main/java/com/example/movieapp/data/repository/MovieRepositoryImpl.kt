@@ -7,8 +7,9 @@ import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.domain.model.MovieDetail
 
 import com.example.movieapp.domain.repository.MovieRepository
+import javax.inject.Inject
 
-class MovieRepositoryImpl(private val movieService: MovieApiService) : MovieRepository {
+class MovieRepositoryImpl @Inject constructor (private val movieService: MovieApiService) : MovieRepository {
     override suspend fun getPopularMovies(): List<Movie> {
         val response: MovieResponse = movieService.getPopularMovies()
         return response.results.map {

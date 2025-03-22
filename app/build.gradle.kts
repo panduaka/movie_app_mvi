@@ -2,6 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+}
+
+kapt {
+    correctErrorTypes = true
 }
 
 android {
@@ -28,11 +34,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    kotlin{
+        jvmToolchain(8)
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
@@ -57,6 +66,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
     // Networking
     implementation(libs.square.moshi.moshi)
     implementation(libs.square.moshi.moshi.adapter)
@@ -68,9 +82,9 @@ dependencies {
 
     //Test
     testImplementation(libs.junit) // JUnit
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.9.23") // Kotlin Test
-    testImplementation("org.mockito:mockito-core:5.10.0") // Mockito Core
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1") // Mockito Kotlin
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0") // Coroutines Test
+    testImplementation(libs.kotlin.test.junit) // Kotlin Test
+    testImplementation(libs.mockito.core) // Mockito Core
+    testImplementation(libs.mockito.kotlin) // Mockito Kotlin
+    testImplementation(libs.kotlinx.coroutines.test) // Coroutines Test
 
 }
