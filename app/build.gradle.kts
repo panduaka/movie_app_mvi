@@ -38,7 +38,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlin{
-        jvmToolchain(8)
+        compilerOptions {
+            languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9)
+        }
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -83,8 +85,8 @@ dependencies {
     //Test
     testImplementation(libs.junit) // JUnit
     testImplementation(libs.kotlin.test.junit) // Kotlin Test
-    testImplementation(libs.mockito.core) // Mockito Core
-    testImplementation(libs.mockito.kotlin) // Mockito Kotlin
     testImplementation(libs.kotlinx.coroutines.test) // Coroutines Test
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent.jvm)
 
 }

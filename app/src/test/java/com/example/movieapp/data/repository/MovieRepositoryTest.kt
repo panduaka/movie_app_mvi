@@ -4,28 +4,31 @@ import com.example.movieapp.data.model.MovieData
 import com.example.movieapp.data.model.MovieResponse
 import com.example.movieapp.data.remote_service.MovieApiService
 import com.example.movieapp.domain.model.Movie
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
 import java.io.IOException
 import kotlin.test.assertFailsWith
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
 @ExperimentalCoroutinesApi
+@RunWith(JUnit4::class)
 class MovieRepositoryTest {
 
-    @Mock
+    @MockK
     private lateinit var movieService: MovieApiService
 
     private lateinit var movieRepository: MovieRepositoryImpl
 
     @Before
     fun setUp() {
-        MockitoAnnotations.openMocks(this)
+        MockKAnnotations.init(this)
         movieRepository = MovieRepositoryImpl(movieService)
     }
 
@@ -109,7 +112,7 @@ class MovieRepositoryTest {
             totalPages = 1,
             totalResults = 2
         )
-        `when`(movieService.getPopularMovies()).thenReturn(movieResponse)
+        coEvery { movieService.getPopularMovies() } returns movieResponse
 
         // Act
         val actualMovies = movieRepository.getPopularMovies()
@@ -121,7 +124,7 @@ class MovieRepositoryTest {
     @Test
     fun `getPopularMovies throws IOException on network error`() = runTest {
         // Arrange
-        `when`(movieService.getPopularMovies()).thenThrow((RuntimeException(IOException())))
+        coEvery { movieService.getPopularMovies() } throws RuntimeException(IOException())
 
         // Act & Assert
         assertFailsWith<RuntimeException> {

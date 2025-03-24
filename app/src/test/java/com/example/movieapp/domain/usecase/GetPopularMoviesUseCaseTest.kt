@@ -7,14 +7,13 @@ import io.mockk.coEvery
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
-
 import org.junit.Before
 import org.junit.Test
+import java.io.IOException
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.io.IOException
-import kotlin.test.assertFailsWith
 
 @ExperimentalCoroutinesApi
 @RunWith(JUnit4::class)
@@ -82,15 +81,12 @@ class GetPopularMoviesUseCaseTest {
     @Test
     fun `invoke throws exception from repository`() = runTest {
         // Arrange
-        val expectedException = RuntimeException(IOException("Network error"))
-
+        val expectedException = IOException("Network error")
         coEvery { movieRepository.getPopularMovies() } throws expectedException
 
         // Act & Assert
-        assertFailsWith<RuntimeException> {
+        assertFailsWith<IOException> {
             getPopularMoviesUseCase.invoke()
-        }.also {
-            assert(it.cause is IOException)
         }
     }
 }
