@@ -10,5 +10,5 @@ import com.example.movieapp.domain.model.MovieDetail
  */
 interface MovieRepository {
     suspend fun getPopularMovies(): List<Movie>
-    suspend fun getMovieDetails(): MovieDetail
+    suspend fun getMovieDetails(movieId: Int, language:String): MovieDetail
 }

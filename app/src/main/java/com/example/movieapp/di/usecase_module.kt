@@ -1,6 +1,7 @@
 package com.example.movieapp.di
 
 import com.example.movieapp.domain.repository.MovieRepository
+import com.example.movieapp.domain.usecase.GetMovieDetailsUseCase
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import dagger.Module
 import dagger.Provides
@@ -16,5 +17,11 @@ object UseCaseModule {
     @ViewModelScoped
     fun provideGetPopularMoviesUseCase(movieRepository: MovieRepository): GetPopularMoviesUseCase {
         return GetPopularMoviesUseCase(movieRepository)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun provideGetMovieDetailsUseCase(movieRepository: MovieRepository): GetMovieDetailsUseCase {
+        return GetMovieDetailsUseCase(movieRepository)
     }
 }

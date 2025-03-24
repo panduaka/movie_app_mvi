@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
+import com.example.movieapp.domain.usecase.GetMovieDetailsUseCase
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import com.example.movieapp.ui.theme.MovieAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -24,6 +25,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var getPopularMoviesUseCase:
             GetPopularMoviesUseCase
+
+    @Inject lateinit var getMovieDetailUseCase:
+            GetMovieDetailsUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +41,17 @@ class MainActivity : ComponentActivity() {
                 Log.e("MovieAPI", "Error fetching movies: ${e.message}")
             }
         }
+
+        lifecycleScope.launch {
+            try {
+                val response = getMovieDetailUseCase.invoke();
+                Log.d("MovieAPI", "Movie details fetched: $response")
+            }
+            catch (e: Exception) {
+                Log.e("MovieAPI", "Error fetching movie details: ${e.message}")
+            }
+        }
+
         enableEdgeToEdge()
         setContent {
             MovieAppTheme {

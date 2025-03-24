@@ -1,9 +1,11 @@
 package com.example.movieapp.data.remote_service
 
 
+import com.example.movieapp.data.model.MovieDetailsData
 import com.example.movieapp.data.model.MovieResponse
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MovieApiService {
@@ -14,4 +16,11 @@ interface MovieApiService {
     )
     @GET("trending/movie/day")
     suspend fun getPopularMovies(@Query("language") language: String = "en-US"): MovieResponse
+
+
+    @GET("movie/{movieId}")
+    suspend fun getMovieDetails(
+        @Path("movieId") movieId: Int,
+        @Query("language") language: String = "en-US"
+    ): MovieDetailsData
 }
