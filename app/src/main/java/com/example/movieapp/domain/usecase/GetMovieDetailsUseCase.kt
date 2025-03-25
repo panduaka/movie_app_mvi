@@ -6,10 +6,10 @@ import com.example.movieapp.domain.repository.MovieRepository
 import javax.inject.Inject
 
 class GetMovieDetailsUseCase @Inject constructor (private val movieRepository: MovieRepository) {
-    suspend operator fun invoke(): MovieDetail {
+    suspend operator fun invoke(movieId: Int, language: String): MovieDetail {
         return movieRepository.getMovieDetails(
-            movieId = 426063,
-            language = "en-US"
+            movieId = movieId,
+            language = language
         );
     }
 }

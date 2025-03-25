@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,13 +20,23 @@ class MovieListViewModel @Inject constructor(
     private val _state = MutableStateFlow<MovieListState>(MovieListState.Loading)
     val state: StateFlow<MovieListState> = _state.asStateFlow()
 
+    private val _eventFlow = MutableSharedFlow<MovieListEvent>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
     init {
         processIntent(MovieListIntent.Initial)
     }
 
-    private fun processIntent(intent: MovieListIntent) {
+   fun processIntent(intent: MovieListIntent) {
         when (intent) {
-            MovieListIntent.Initial -> fetchMovies()
+            is MovieListIntent.Initial -> fetchMovies()
+            is MovieListIntent.SelectMovie -> selectMovie(intent.movieId)
+        }
+    }
+
+    private fun selectMovie(movieId: Int) {
+        viewModelScope.launch {
+            _eventFlow.emit(MovieListEvent.NavigateToDetail(movieId))
         }
     }
 

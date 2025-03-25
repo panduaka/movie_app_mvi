@@ -26,6 +26,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,6 +45,7 @@ import coil.request.ImageRequest
 import com.example.movieapp.R
 import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.ui.navigation.Screen
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun MovieListScreen(
@@ -52,12 +54,22 @@ fun MovieListScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is MovieListEvent.NavigateToDetail -> {
+                    navController.navigate(Screen.MovieDetail.route + "?movieId=${event.movieId}")
+                }
+            }
+        }
+    }
+
     when (state) {
         is MovieListState.Loading -> LoadingScreen()
         is MovieListState.Success -> MovieList(
             movies = (state as MovieListState.Success).movies,
             onMovieClick = { movieId ->
-                navController.navigate(Screen.MovieDetail.route + "?movieId=$movieId") // Navigate to details screen
+                viewModel.processIntent(MovieListIntent.SelectMovie(movieId))
             }
         )
         is MovieListState.Error -> ErrorScreen(message = (state as MovieListState.Error).message)
