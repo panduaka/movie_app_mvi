@@ -1,7 +1,6 @@
 package com.example.movieapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,84 +10,45 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.lifecycleScope
-import com.example.movieapp.domain.usecase.GetMovieDetailsUseCase
-import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.movieapp.ui.movie_list_screen.MovieListScreen
 import com.example.movieapp.ui.theme.MovieAppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var getPopularMoviesUseCase:
-            GetPopularMoviesUseCase
-
-    @Inject lateinit var getMovieDetailUseCase:
-            GetMovieDetailsUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Fetch movies in a coroutine
-        lifecycleScope.launch {
-            try {
-                val response = getPopularMoviesUseCase.invoke();
-                Log.d("MovieAPI", "Movies fetched: $response")
-            } catch (e: Exception) {
-                Log.e("MovieAPI", "Error fetching movies: ${e.message}")
-            }
-        }
-
-        lifecycleScope.launch {
-            try {
-                val response = getMovieDetailUseCase.invoke();
-                Log.d("MovieAPI", "Movie details fetched: $response")
-            }
-            catch (e: Exception) {
-                Log.e("MovieAPI", "Error fetching movie details: ${e.message}")
-            }
-        }
-
         enableEdgeToEdge()
         setContent {
             MovieAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    MovieListScreen()
                 }
             }
         }
     }
 }
 
-//@Composable
-//fun MovieNavGraph() {
-//    val navController = rememberNavController()
-//    NavHost(navController, startDestination = "movie_list") {
-//        composable("movie_list") { MovieListScreen(viewModel = MovieViewModel(), navController) }
-//        composable("movie_detail/{movieId}") { backStackEntry ->
-//            MovieDetailScreen(movieId = backStackEntry.arguments?.getString("movieId")?.toInt() ?: 0)
-//        }
-//    }
-//}
-
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun SayHello(modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
+        text = "Hello, Jetpack Compose!",
         modifier = modifier
     )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    MovieAppTheme {
-        Greeting("Android")
+fun MovieNavGraph(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = "movie_list",
+        modifier = modifier
+    ) {
+        composable("movie_list") { MovieListScreen() }
     }
 }

@@ -67,6 +67,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+// Image
+    //To display Images from URL
+    implementation(libs.coil.compose)
 
     // Hilt
     implementation(libs.hilt.android)
