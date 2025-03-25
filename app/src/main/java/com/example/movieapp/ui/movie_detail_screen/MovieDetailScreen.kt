@@ -17,9 +17,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.movieapp.R
@@ -40,6 +49,7 @@ import com.example.movieapp.domain.model.MovieDetail
 @Composable
 fun MovieDetailScreen(
     movieId: String?,
+    navController: NavController,
     viewModel: MovieDetailsViewModel = hiltViewModel()
 ) {
     val state: MovieDetailState by viewModel.state.collectAsState()
@@ -50,22 +60,49 @@ fun MovieDetailScreen(
         }
     }
 
-    when (state) {
-        MovieDetailState.Loading -> LoadingScreen()
-        is MovieDetailState.Success -> MovieDetailContent(movieDetail = (state as MovieDetailState.Success).movieDetail)
-        is MovieDetailState.Error -> ErrorScreen(message = (state as MovieDetailState.Error).message)
+    Scaffold(
+        topBar = {
+            AppBar(navController = navController)
+        }
+    ) {
+        paddingValues ->
+        when (state) {
+            MovieDetailState.Loading -> LoadingScreen(modifier = Modifier.padding(paddingValues))
+            is MovieDetailState.Success -> MovieDetailContent(modifier = Modifier.padding(paddingValues), movieDetail = (state as MovieDetailState.Success).movieDetail)
+            is MovieDetailState.Error -> ErrorScreen(modifier = Modifier.padding(paddingValues), message = (state as MovieDetailState.Error).message)
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoadingScreen() {
+fun AppBar(navController: NavController) {
+    TopAppBar(
+        title = { Text(text = "Movie Details") },
+        navigationIcon = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary
+        )
+    )
+}
+
+@Composable
+fun LoadingScreen(modifier: Modifier) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
 }
 
 @Composable
-fun ErrorScreen(message: String) {
+fun ErrorScreen(message: String, modifier: Modifier) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -78,20 +115,20 @@ fun ErrorScreen(message: String) {
 }
 
 @Composable
-fun MovieDetailContent(movieDetail: MovieDetail) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .background(MaterialTheme.colorScheme.background)
-            .padding(
-                paddingValues = PaddingValues(
-                    start = 16.dp,
-                    top = 16.dp + WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-                    end = 16.dp,
-                    bottom = 16.dp
-                )
+fun MovieDetailContent(movieDetail: MovieDetail, modifier: Modifier) {
+    modifier.fillMaxSize()
+        .verticalScroll(rememberScrollState())
+        .background(MaterialTheme.colorScheme.background)
+        .padding(
+            paddingValues = PaddingValues(
+                start = 16.dp,
+                top = 16.dp + WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                end = 16.dp,
+                bottom = 16.dp
             )
+        )
+    Column(
+        modifier = modifier
     ) {
         // Backdrop Image
         MovieBackdrop(backdropPath = movieDetail.backdropPath)

@@ -27,7 +27,7 @@ fun NavigationStack(modifier: Modifier = Modifier) {
                 }
             )
         ) {
-            MovieDetailScreen(movieId = it.arguments?.getString("movieId"))
+            MovieDetailScreen(movieId = it.arguments?.getString("movieId"), navController = navController)
         }
     }
 }
