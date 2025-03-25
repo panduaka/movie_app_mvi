@@ -67,7 +67,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-// Image
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+
+    // Image
     //To display Images from URL
     implementation(libs.coil.compose)
 

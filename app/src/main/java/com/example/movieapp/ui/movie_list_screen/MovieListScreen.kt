@@ -2,6 +2,7 @@ package com.example.movieapp.ui.movie_list_screen
 
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,20 +38,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.movieapp.R
 import com.example.movieapp.domain.model.Movie
+import com.example.movieapp.ui.navigation.Screen
 
 @Composable
 fun MovieListScreen(
+    navController: NavController,
     viewModel: MovieListViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
     when (state) {
         is MovieListState.Loading -> LoadingScreen()
-        is MovieListState.Success -> MovieList(movies = (state as MovieListState.Success).movies)
+        is MovieListState.Success -> MovieList(
+            movies = (state as MovieListState.Success).movies,
+            onMovieClick = { movieId ->
+                navController.navigate(Screen.MovieDetail.route + "?movieId=$movieId") // Navigate to details screen
+            }
+        )
         is MovieListState.Error -> ErrorScreen(message = (state as MovieListState.Error).message)
     }
 }
@@ -63,7 +72,7 @@ fun LoadingScreen() {
 }
 
 @Composable
-fun MovieList(movies: List<Movie>) {
+fun MovieList(movies: List<Movie>, onMovieClick: (Int) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(
@@ -75,17 +84,23 @@ fun MovieList(movies: List<Movie>) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(movies) { movie ->
-            MovieItem(movie = movie)
+            MovieItem(
+                movie = movie,
+                onMovieClick = onMovieClick
+            )
         }
     }
 }
 
 @Composable
-fun MovieItem(movie: Movie) {
+fun MovieItem(movie: Movie, onMovieClick: (Int) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                onMovieClick(movie.id)
+            },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
