@@ -50,7 +50,8 @@ import com.example.movieapp.domain.model.MovieDetail
 fun MovieDetailScreen(
     movieId: String?,
     navController: NavController,
-    viewModel: MovieDetailsViewModel = hiltViewModel()
+    viewModel: MovieDetailsViewModel = hiltViewModel(),
+    modifier: Modifier
 ) {
     val state: MovieDetailState by viewModel.state.collectAsState()
 
@@ -61,6 +62,7 @@ fun MovieDetailScreen(
     }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             AppBar(navController = navController)
         }
@@ -96,7 +98,7 @@ fun AppBar(navController: NavController) {
 
 @Composable
 fun LoadingScreen(modifier: Modifier) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
 }
@@ -104,8 +106,7 @@ fun LoadingScreen(modifier: Modifier) {
 @Composable
 fun ErrorScreen(message: String, modifier: Modifier) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally

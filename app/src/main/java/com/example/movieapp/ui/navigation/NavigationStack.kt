@@ -16,7 +16,10 @@ fun NavigationStack(modifier: Modifier = Modifier) {
 
     NavHost(navController = navController, startDestination = Screen.MovieList.route) {
         composable(route = Screen.MovieList.route) {
-            MovieListScreen(navController = navController)
+            MovieListScreen(
+                modifier = modifier,
+                navController = navController
+            )
         }
         composable(
             route = Screen.MovieDetail.route + "?movieId={movieId}",
@@ -27,7 +30,11 @@ fun NavigationStack(modifier: Modifier = Modifier) {
                 }
             )
         ) {
-            MovieDetailScreen(movieId = it.arguments?.getString("movieId"), navController = navController)
+            MovieDetailScreen(
+                modifier = modifier,
+                movieId = it.arguments?.getString("movieId"),
+                navController = navController
+            )
         }
     }
 }

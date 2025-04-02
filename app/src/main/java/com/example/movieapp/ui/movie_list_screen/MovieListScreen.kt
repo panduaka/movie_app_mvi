@@ -52,7 +52,8 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun MovieListScreen(
     navController: NavController,
-    viewModel: MovieListViewModel = hiltViewModel()
+    viewModel: MovieListViewModel = hiltViewModel(),
+    modifier: Modifier
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -67,6 +68,7 @@ fun MovieListScreen(
     }
 
     Scaffold (
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(text = "Trending Movies") }
@@ -93,7 +95,7 @@ fun MovieListScreen(
 
 @Composable
 fun LoadingScreen(modifier: Modifier) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator()
     }
 }
@@ -209,7 +211,7 @@ fun MoviePoster(posterPath: String?) {
 @Composable
 fun ErrorScreen(message: String, modifier: Modifier) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
