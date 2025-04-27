@@ -1,38 +1,57 @@
 package com.example.movieapp.ui.movie_detail_screen
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieapp.domain.usecase.GetMovieDetailsUseCase
+import com.example.movieapp.ui.movie_list_screen.IsLoading
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.movieapp.ui.movie_list_screen.Error
 
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
     private val getMovieDetailUseCase: GetMovieDetailsUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow<MovieDetailState>(MovieDetailState.Loading)
-    val state: StateFlow<MovieDetailState> = _state.asStateFlow()
+
+    var state by mutableStateOf<MovieDetailState>(MovieDetailState())
+        private set
+
+    fun onAction() {
+
+    }
 
     fun getMovieDetail(movieId: Int) {
         viewModelScope.launch {
-            _state.update { MovieDetailState.Loading }
+            state = state.copy(
+                isLoading = IsLoading(true),
+            )
             try {
                 val movieDetail = getMovieDetailUseCase.invoke(
                     movieId = movieId,
                     language = "en-US"
                 )
                 if (movieDetail.movieDetail == null) {
-                    _state.update { MovieDetailState.Error("Movie detail not found") }
+                    state = state.copy(
+                        isLoading = IsLoading(false),
+                        error = Error(
+                            error = "Movie detail not found"
+                        )
+                    )
                 } else {
-                    _state.update { MovieDetailState.Success(movieDetail.movieDetail) }
+                    state = state.copy(
+                        isLoading = IsLoading(false),
+                        movieDetail = movieDetail.movieDetail
+                    )
                 }
             } catch (e: Exception) {
-                _state.update { MovieDetailState.Error(e.message ?: "Unknown error") }
+                state = state.copy(
+                    isLoading = IsLoading(false),
+                    error = Error(e.message ?: "Unknown error")
+                )
             }
         }
     }

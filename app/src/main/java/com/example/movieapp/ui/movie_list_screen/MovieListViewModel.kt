@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.movieapp.domain.model.MovieResult
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

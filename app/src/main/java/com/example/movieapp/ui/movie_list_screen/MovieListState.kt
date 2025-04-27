@@ -3,7 +3,7 @@ package com.example.movieapp.ui.movie_list_screen
 import com.example.movieapp.domain.model.Movie
 
 data class MovieListState(
-    val isLoading: IsLoading = IsLoading(false),
+    val isLoading: IsLoading = IsLoading(true),
     val movies: List<Movie> = emptyList(),
     val error: Error = Error(""),
     val endReached: EndReach = EndReach(false),

@@ -30,8 +30,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -53,7 +51,7 @@ fun MovieDetailScreen(
     viewModel: MovieDetailsViewModel = hiltViewModel(),
     modifier: Modifier
 ) {
-    val state: MovieDetailState by viewModel.state.collectAsState()
+    val state = viewModel.state
 
     LaunchedEffect(key1 = movieId) {
         if (movieId != null) {
@@ -68,12 +66,32 @@ fun MovieDetailScreen(
         }
     ) {
         paddingValues ->
-        when (state) {
-            MovieDetailState.Loading -> LoadingScreen(modifier = Modifier.padding(paddingValues))
-            is MovieDetailState.Success -> MovieDetailContent(modifier = Modifier.padding(paddingValues), movieDetail = (state as MovieDetailState.Success).movieDetail)
-            is MovieDetailState.Error -> ErrorScreen(modifier = Modifier.padding(paddingValues), message = (state as MovieDetailState.Error).message)
-        }
+        MovieDetailContent(
+            modifier = Modifier.padding(paddingValues),
+            state = state,
+            onAction = {
+                viewModel.onAction()
+            }
+        )
     }
+}
+
+@Composable
+fun MovieDetailContent(
+    modifier: Modifier,
+    state: MovieDetailState,
+    onAction: (MovieDetailsAction) -> Unit
+) {
+    if (state.isLoading.isLoading) {
+        LoadingScreen(modifier = modifier)
+    }
+    else if (state.error.error.isBlank()) {
+        ErrorScreen(message = state.error.error, modifier = modifier)
+    }
+    else if (state.movieDetail != null) {
+        MovieDetailContent(movieDetail = state.movieDetail, modifier = modifier)
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
