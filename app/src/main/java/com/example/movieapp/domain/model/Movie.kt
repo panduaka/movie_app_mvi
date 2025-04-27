@@ -1,5 +1,17 @@
 package com.example.movieapp.domain.model
 
+data class MovieResult(
+    val movies: List<Movie> = emptyList(),
+    val errorMessage: String? = null,
+    val status: Status = Status.LOADING
+) {
+    enum class Status {
+        LOADING,
+        SUCCESS,
+        ERROR
+    }
+}
+
 data class Movie(
     val id: Int,
     val title: String,

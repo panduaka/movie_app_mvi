@@ -22,9 +22,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            buildConfigField("String", "BASE_URL", "\"https://api.themoviedb.org/3/\"")
+            buildConfigField("String", "API_KEY", "\"eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI5YzA3M2ViNjc1ZGNlZTY0NDYxMjQ1M2Q3ZWEwNzM2NiIsIm5iZiI6MTc0MjQxOTkxNS4xMzMsInN1YiI6IjY3ZGIzN2NiOWYzNThmNGExMzdmODU0YyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.332uWrq_Gil3_6882D-UJwe2RUwKJ5PU9BiNgw6DcL8\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -32,6 +38,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+    buildFeatures {
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

@@ -8,30 +8,58 @@ import com.example.movieapp.data.model.ProductionCompanyData
 import com.example.movieapp.data.model.ProductionCountryData
 import com.example.movieapp.data.model.SpokenLanguageData
 import com.example.movieapp.data.remote_service.MovieApiService
+import com.example.movieapp.data.remote_service.NetworkResult
 import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.domain.model.MovieDetail
 
 import com.example.movieapp.domain.repository.MovieRepository
+import kotlinx.coroutines.delay
+import retrofit2.Response
 import javax.inject.Inject
 
-class MovieRepositoryImpl @Inject constructor (private val movieService: MovieApiService) : MovieRepository {
-    override suspend fun getPopularMovies(): List<Movie> {
-        val response: MovieResponse = movieService.getPopularMovies()
-        return response.results.map {
-            it.toDomain();
+class MovieRepositoryImpl @Inject constructor(private val movieService: MovieApiService) :
+    MovieRepository {
+    override suspend fun getPopularMovies(): NetworkResult<List<Movie>> {
+        return try {
+            NetworkResult.Loading(data = null, message = null)
+            delay(1000)
+            val response: Response<MovieResponse> = movieService.getPopularMovies()
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    NetworkResult.Success(body.results.map { it.toDomain() })
+                } else {
+                    NetworkResult.Error("Error: Response body is null")
+                }
+            } else {
+                NetworkResult.Error("Error: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            NetworkResult.Error("Error: Unknown Error ${e.message}")
         }
     }
 
-    override suspend fun getMovieDetails(movieId:Int, language: String): MovieDetail {
-        val response: MovieDetailsData  = movieService.getMovieDetails(
-            movieId = movieId,
-            language = language
-        )
-
-        return response.toMovieDetailDomain();
+    override suspend fun getMovieDetails(movieId: Int, language: String): NetworkResult<MovieDetail> {
+        return try {
+            val response = movieService.getMovieDetails(movieId, language)
+            NetworkResult.Loading(data = null, message = null)
+            delay(1000)
+            if(response.isSuccessful) {
+                val details = response.body()
+                if(details != null) {
+                    NetworkResult.Success(details.toMovieDetailDomain())
+                } else {
+                    NetworkResult.Error("Error: Response body is null")
+                }
+            } else {
+                NetworkResult.Error("Error: ${response.code()}")
+            }
+        } catch (e:Exception) {
+            NetworkResult.Error("Error: Unknown Error ${e.message}")
+        }
     }
 
-    private  fun MovieDetailsData.toMovieDetailDomain(): MovieDetail {
+    private fun MovieDetailsData.toMovieDetailDomain(): MovieDetail {
         return MovieDetail(
             adult = adult,
             backdropPath = backdropPath,

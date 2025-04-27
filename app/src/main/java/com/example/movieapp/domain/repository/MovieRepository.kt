@@ -1,5 +1,6 @@
 package com.example.movieapp.domain.repository
 
+import com.example.movieapp.data.remote_service.NetworkResult
 import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.domain.model.MovieDetail
 
@@ -9,6 +10,6 @@ import com.example.movieapp.domain.model.MovieDetail
  *  They abstract away the details of where the data comes from (network, database, etc.)
  */
 interface MovieRepository {
-    suspend fun getPopularMovies(): List<Movie>
-    suspend fun getMovieDetails(movieId: Int, language:String): MovieDetail
+    suspend fun getPopularMovies(): NetworkResult<List<Movie>>
+    suspend fun getMovieDetails(movieId: Int, language:String): NetworkResult<MovieDetail>
 }

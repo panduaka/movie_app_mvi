@@ -1,5 +1,18 @@
 package com.example.movieapp.domain.model
 
+
+data class MovieDetailResult(
+    val movieDetail: MovieDetail? = null,
+    val errorMessage: String? = null,
+    val status: Status = Status.LOADING
+) {
+    enum class Status {
+        LOADING,
+        SUCCESS,
+        ERROR
+    }
+}
+
 data class MovieDetail(
     val adult: Boolean,
     val backdropPath: String?,

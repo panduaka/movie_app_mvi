@@ -2,6 +2,7 @@ package com.example.movieapp.ui.movie_list_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.movieapp.domain.model.MovieResult
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -42,10 +43,18 @@ class MovieListViewModel @Inject constructor(
 
     private fun fetchMovies() {
         viewModelScope.launch {
-            _state.value = MovieListState.Loading
             try {
-                val movies = getPopularMoviesUseCase.invoke()
-                _state.value = MovieListState.Success(movies)
+                val moviesResult = getPopularMoviesUseCase.invoke()
+                if (moviesResult.status == MovieResult.Status.LOADING) {
+                    _state.value = MovieListState.Loading
+                }
+                if (moviesResult.movies.isEmpty()) {
+                    _state.value = MovieListState.Error(
+                        "No movies found"
+                    )
+                } else {
+                    _state.value  = MovieListState.Success(moviesResult.movies)
+                }
             } catch (e: Exception) {
                 _state.value = MovieListState.Error("Error fetching movies: ${e.message}")
             }

@@ -26,7 +26,11 @@ class MovieDetailsViewModel @Inject constructor(
                     movieId = movieId,
                     language = "en-US"
                 )
-                _state.update { MovieDetailState.Success(movieDetail) }
+                if (movieDetail.movieDetail == null) {
+                    _state.update { MovieDetailState.Error("Movie detail not found") }
+                } else {
+                    _state.update { MovieDetailState.Success(movieDetail.movieDetail) }
+                }
             } catch (e: Exception) {
                 _state.update { MovieDetailState.Error(e.message ?: "Unknown error") }
             }
