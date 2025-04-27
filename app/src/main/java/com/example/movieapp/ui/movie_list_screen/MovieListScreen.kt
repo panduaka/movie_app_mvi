@@ -1,7 +1,6 @@
 package com.example.movieapp.ui.movie_list_screen
 
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,8 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,7 +43,6 @@ import coil.request.ImageRequest
 import com.example.movieapp.R
 import com.example.movieapp.domain.model.Movie
 import com.example.movieapp.ui.navigation.Screen
-import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,19 +51,8 @@ fun MovieListScreen(
     viewModel: MovieListViewModel = hiltViewModel(),
     modifier: Modifier
 ) {
-    val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when (event) {
-                is MovieListEvent.NavigateToDetail -> {
-                    navController.navigate(Screen.MovieDetail.route + "?movieId=${event.movieId}")
-                }
-            }
-        }
-    }
-
-    Scaffold (
+    Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
@@ -75,20 +60,43 @@ fun MovieListScreen(
             )
         }
     ) { paddingValues ->
-        when (state) {
-            is MovieListState.Loading -> LoadingScreen(modifier = Modifier.padding(paddingValues))
-            is MovieListState.Success -> MovieList(
-                modifier = Modifier.padding(paddingValues),
-                movies = (state as MovieListState.Success).movies,
+
+        MovieListCoreScreen(
+            modifier = Modifier.padding(paddingValues),
+            state = viewModel.state,
+            onAction = viewModel::onAction,
+            navController = navController
+        )
+    }
+}
+
+@Composable
+fun MovieListCoreScreen(
+    modifier: Modifier = Modifier,
+    state: MovieListState,
+    onAction: (MovieListIntent) -> Unit,
+    navController: NavController,
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        if (state.isLoading.isLoading) {
+            LoadingScreen(modifier = Modifier.align(Alignment.Center))
+        }
+        if (state.error.error.isNotBlank()) {
+            ErrorScreen(message = state.error.error, modifier = Modifier.align(Alignment.Center))
+        }
+        if (state.movies.isNotEmpty()) {
+            MovieList(
+                modifier = Modifier.fillMaxSize(),
+                movies = state.movies,
                 onMovieClick = { movieId ->
-                    viewModel.processIntent(MovieListIntent.SelectMovie(movieId))
+                    onAction(MovieListIntent.SelectMovie(movieId))
                 }
             )
-
-            is MovieListState.Error -> ErrorScreen(
-                modifier = Modifier.padding(paddingValues),
-                message = (state as MovieListState.Error).message
-            )
+        }
+        if (state.goToMovieDetails != null) {
+            LaunchedEffect(key1 = true) {
+                navController.navigate(Screen.MovieDetail.route + "?movieId=${state.goToMovieDetails.movieId}")
+            }
         }
     }
 }

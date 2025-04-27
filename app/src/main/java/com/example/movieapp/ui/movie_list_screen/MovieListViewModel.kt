@@ -1,15 +1,14 @@
 package com.example.movieapp.ui.movie_list_screen
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.movieapp.domain.model.MovieResult
 import com.example.movieapp.domain.usecase.GetPopularMoviesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,17 +17,33 @@ class MovieListViewModel @Inject constructor(
     private val getPopularMoviesUseCase: GetPopularMoviesUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<MovieListState>(MovieListState.Loading)
-    val state: StateFlow<MovieListState> = _state.asStateFlow()
+    /**
+     * Coming from Coroutines API
+     *
+     * These are part of Kotlin Coroutines' Flow API, designed for asynchronous data streams.
+     * MutableStateFlow is a state holder that can emit new values.
+     * StateFlow is a read-only flow that exposes the latest value emitted by a MutableStateFlow.
+     * They are excellent for complex asynchronous scenarios and reactive programming patterns.
+     * Updates are done by assigning a new value to the value property of the MutableStateFlow.
+     */
+//    private val _state = MutableStateFlow<MovieListState>(MovieListState.Loading)
+//    val state: StateFlow<MovieListState> = _state.asStateFlow()
 
-    private val _eventFlow = MutableSharedFlow<MovieListEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    /**
+     * This is part of Jetpack Compose's state management system.
+     * It's specifically designed to trigger recomposition in Compose when the value changes.
+     * Updates are done by assigning a new value to the variable.
+     * It's typically used for state that directly affects the UI in a Compose-based application.
+     * It is a simple solution for UI state management, not for complex asynchronous operations
+     */
+    var state by mutableStateOf<MovieListState>(MovieListState())
+        private set
 
     init {
-        processIntent(MovieListIntent.Initial)
+        onAction(MovieListIntent.Initial)
     }
 
-   fun processIntent(intent: MovieListIntent) {
+   fun onAction(intent: MovieListIntent) {
         when (intent) {
             is MovieListIntent.Initial -> fetchMovies()
             is MovieListIntent.SelectMovie -> selectMovie(intent.movieId)
@@ -36,9 +51,9 @@ class MovieListViewModel @Inject constructor(
     }
 
     private fun selectMovie(movieId: Int) {
-        viewModelScope.launch {
-            _eventFlow.emit(MovieListEvent.NavigateToDetail(movieId))
-        }
+        state = state.copy(
+            goToMovieDetails = MovieDetail(movieId)
+        )
     }
 
     private fun fetchMovies() {
@@ -46,17 +61,27 @@ class MovieListViewModel @Inject constructor(
             try {
                 val moviesResult = getPopularMoviesUseCase.invoke()
                 if (moviesResult.status == MovieResult.Status.LOADING) {
-                    _state.value = MovieListState.Loading
+                    state = state.copy(
+                        isLoading = IsLoading(true)
+                    )
                 }
-                if (moviesResult.movies.isEmpty()) {
-                    _state.value = MovieListState.Error(
-                        "No movies found"
+                else if (moviesResult.movies.isEmpty()) {
+                    state = state.copy(
+                        isLoading = IsLoading(false),
+                        error = Error("No movies found")
                     )
                 } else {
-                    _state.value  = MovieListState.Success(moviesResult.movies)
+                    state = state.copy(
+                        isLoading = IsLoading(false),
+                        page = Page(1),
+                        movies = moviesResult.movies
+                    )
                 }
             } catch (e: Exception) {
-                _state.value = MovieListState.Error("Error fetching movies: ${e.message}")
+                state = state.copy(
+                    isLoading = IsLoading(false),
+                    error = Error(e.message ?: "Unknown error")
+                )
             }
         }
     }
