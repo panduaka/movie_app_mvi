@@ -58,7 +58,7 @@ class MovieListViewModel @Inject constructor(
     private fun fetchMovies() {
         viewModelScope.launch {
             try {
-                val moviesResult = getPopularMoviesUseCase.invoke()
+                val moviesResult = getPopularMoviesUseCase()
                 if (moviesResult.status == MovieResult.Status.LOADING) {
                     state = state.copy(
                         isLoading = IsLoading(true)

@@ -30,7 +30,7 @@ class MovieDetailsViewModel @Inject constructor(
                 isLoading = IsLoading(true),
             )
             try {
-                val movieDetail = getMovieDetailUseCase.invoke(
+                val movieDetail = getMovieDetailUseCase(
                     movieId = movieId,
                     language = "en-US"
                 )
