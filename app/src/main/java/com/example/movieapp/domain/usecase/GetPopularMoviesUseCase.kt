@@ -24,7 +24,6 @@ class GetPopularMoviesUseCase @Inject constructor (private val movieRepository: 
                     status = MovieResult.Status.ERROR
                 )
             }
-
         }
     }
 }
